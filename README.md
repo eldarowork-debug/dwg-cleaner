@@ -100,4 +100,4 @@ python Clean-DWG.py "C:\Projects\dwg_input" --spline-method fixed --spline-segme
 
 ## License
 
-No license is specified in the repository.
+MIT License
