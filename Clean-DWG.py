@@ -355,28 +355,6 @@ def remove_short_segments(points, min_length, remove_short=True, keep_short_segm
     
     return filtered
 
-# def flatten_arc_to_points(arc, max_segments=3, tolerance=0.9):
-#     """
-#     Convert an arc to line segments.
-    
-#     Args:
-#         arc: ezdxf arc entity
-#         max_segments: Maximum number of segments (higher = smoother)
-#         tolerance: Maximum deviation from curve (lower = more segments)
-    
-#     Returns:
-#         List of points
-#     """
-#     try:
-#         # Calculate distance parameter based on desired segments and tolerance
-#         # Smaller distance = more segments
-#         distance = min(arc.radius * math.radians(arc.dxf.end_angle - arc.dxf.start_angle) / max_segments, tolerance)
-#         points = list(arc.flattening(distance=distance, segments=max_segments * 2))
-#         return points
-#     except Exception as e:
-#         print(f"      Warning: Arc flattening failed: {e}")
-#         return None
-
 def flatten_arc_to_lines(arc, max_segments=None, tolerance=0.9, segment_angle=None):
     """
     Convert an arc to line segments.
@@ -886,8 +864,6 @@ def process_folder(input_folder, output_folder, oda_converter, config, args):
         print(f"ERROR: Input folder does not exist: {input_folder}")
         return
     
-    # output_folder.mkdir(parents=True, exist_ok=True)
-    
     dwg_files = list(input_folder.glob("*.dwg"))
     
     if not dwg_files or len(dwg_files) == 0:
@@ -908,11 +884,6 @@ def process_folder(input_folder, output_folder, oda_converter, config, args):
                 print(f"  Backup: {backup_path}")
             output_path = dwg_file
         else:
-            # output_path = output_folder / str("dist_" + str(args.distance) + "_prec_" + str(args.precision) + "_" + dwg_file.name)
-            # output_path = output_folder / str("tolerance_" + str(config['spline_tolerance']) +
-            #                               "_segments_" + str(config['spline_segments']) +
-            #                               "_line-length_" + str(config['min_line_length']) +
-            #                               "_" + dwg_file.name)
             if args.clean_names:
                 output_path = output_folder / dwg_file.name
             else:
@@ -1087,17 +1058,6 @@ def main():
         
     display_config(oda_converter, config)
 
-    # print(f"Using ODA File Converter: {oda_converter}")
-    # print(f"Configuration:")
-    # print(f"  Spline method: {config['spline_method']}")
-    # print(f"  Spline segments: {config['spline_segments']}")
-    # print(f"  Spline tolerance: {config['spline_tolerance']}")
-    # print(f"  Ellipse segments: {config['ellipse_segments']}")
-    # print(f"  Min line length: {config['min_line_length']}")
-    # print(f"  Simplify existing: {config['simplify_existing']}")
-    # print(f"  Keep short segments: {config['keep_short_segments']}")
-    # print()
-
     if args.profiler:
         profiler.enabled = True
     else:
@@ -1113,69 +1073,9 @@ def main():
 
     output_folder = get_output_dir(input_folder, args)
     
-    # if args.in_place:
-    #     output_folder = input_folder
-    # elif args.output:
-    #     output_folder = Path(args.output)
-    #     output_folder.mkdir(parents=True, exist_ok=True)
-    # else:
-    #     output_folder = input_folder / DEFAULT_OUTPUT_DIR_SUFFIX
-    #     output_folder.mkdir(exist_ok=True)
-    #     time_current = datetime.now()
-    #     output_folder = output_folder / time_current.strftime("%y-%m-%d_%H-%M-%S")
-    #     output_folder.mkdir(parents=True, exist_ok=True)
-    
     log_config_to_file(output_folder, config, args)
 
     process_folder(input_folder, output_folder, oda_converter, config, args)
-
-    # # Find DWG files
-    # dwg_files = list(input_folder.glob("*.dwg"))
-    
-    # if not dwg_files:
-    #     print(f"No DWG files found in {input_folder}")
-    #     sys.exit(0)
-    
-    # print(f"Found {len(dwg_files)} DWG file(s)\n")
-    
-    # # Process files
-    # success_count = 0
-    
-    # for dwg_file in dwg_files:
-    #     # Log configuration
-    #     print(f"Processing: {dwg_file.name}")
-        
-    #     if args.in_place:
-    #         if args.backup:
-    #             backup_path = str(dwg_file) + ".bak"
-    #             shutil.copy2(dwg_file, backup_path)
-    #             print(f"  Backup: {backup_path}")
-    #         output_path = dwg_file
-    #     else:
-    #         # output_path = output_folder / str("dist_" + str(args.distance) + "_prec_" + str(args.precision) + "_" + dwg_file.name)
-    #         # output_path = output_folder / str("tolerance_" + str(config['spline_tolerance']) +
-    #         #                               "_segments_" + str(config['spline_segments']) +
-    #         #                               "_line-length_" + str(config['min_line_length']) +
-    #         #                               "_" + dwg_file.name)
-    #         if args.clean_names:
-    #             output_path = output_folder / dwg_file.name
-    #         else:
-    #             output_path = output_folder / str("t_" + str(config['spline_tolerance']) +
-    #                                         "_s_" + str(config['spline_segments']) +
-    #                                         "_ll_" + str(config['min_line_length']) +
-    #                                         "_" + dwg_file.name)
-        
-    #     if process_dwg(str(dwg_file), str(output_path), oda_converter, config, args.keep_temp):
-    #         success_count += 1
-        
-    #     print()
-    
-    # # Summary
-    # print("=" * 50)
-    # print(f"COMPLETE: {success_count}/{len(dwg_files)} files processed")
-    # print("=" * 50)
-    # if args.profiler:
-    #     profiler.summary()
 
 
 if __name__ == "__main__":
